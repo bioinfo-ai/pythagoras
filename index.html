@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pythagoras Calculator</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 400px; margin: 40px auto; padding: 20px; }
+    .card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    label { display: block; margin-top: 12px; font-weight: 600; }
+    input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #94a3b8; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    button { width: 100%; margin-top: 20px; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .result-box { margin-top: 20px; padding: 16px; background: #f1f5f9; border-radius: 8px; text-align: center; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Pythagoras ($c = \sqrt{a^2 + b^2}$)</h2>
+    
+    <label for="inputA">Value a (Column A):</label>
+    <input type="number" id="inputA" placeholder="Enter number a" step="any">
+
+    <label for="inputB">Value b (Column B):</label>
+    <input type="number" id="inputB" placeholder="Enter number b" step="any">
+
+    <button onclick="calculatePythagoras()">Calculate C</button>
+
+    <div class="result-box">
+      Result (Column C): <strong id="outputC">--</strong>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4VP8bLXml396ZhOxeCtmxs1BfcdEYQR3ZIfz1SleNo_KoqMYsMhLn8oPubiSJafUt/exec";
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+
+    
+    async function calculatePythagoras() {
+  const aVal = document.getElementById("inputA").value;
+  const bVal = document.getElementById("inputB").value;
+  const outputEl = document.getElementById("outputC");
+
+  // Check if empty, or less than / equal to 0
+  if (aVal === "" || bVal === "" || Number(aVal) <= 0 || Number(bVal) <= 0) {
+    outputEl.innerText = "Error: Both values must be greater than 0!";
+    return;
+  }
+
+  outputEl.innerText = "Calculating...";
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ a: aVal, b: bVal })
+    });
+    const data = await response.json();
+    outputEl.innerText = data.c;
+  } catch (err) {
+    outputEl.innerText = "Connection error";
+  }
+}
+  </script>
+</body>
+</html>
